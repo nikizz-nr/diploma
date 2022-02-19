@@ -1,0 +1,8 @@
+#!/bin/bash
+kubectl apply -f kubernetes/nhlstats_namespace.yaml
+kubectl create secret generic app-config --from-env-file=.env.kuber -n nhlstats
+kubectl apply -f kubernetes/pg_deployment.yaml
+kubectl apply -f kubernetes/pg_service.yaml
+kubectl apply -f kubernetes/nhlstats_deployment.yaml
+kubectl apply -f kubernetes/nhlstats_service.yaml
+kubectl apply -f kubernetes/nhlstats_ingress.yaml

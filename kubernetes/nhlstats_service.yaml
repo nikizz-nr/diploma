@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nhlstats-web
+  namespace: nhlstats
+  labels:
+    app: nhlstats-web
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8000
+  selector:
+    app: nhlstats-web
+  type: ClusterIP

@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nhlstats-web
+  namespace: nhlstats
+  labels:
+    app: nhlstats-web
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nhlstats-web
+  template:
+    metadata:
+      labels:
+        app: nhlstats-web
+    spec:
+      containers:
+      - image: todo:fill_me
+        imagePullPolicy: Always
+        name: nhlstats
+        ports:
+        - containerPort: 8000
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        env:
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: app-config
+                key: DB_PASSWORD
+          - name: DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: app-config
+                key: DB_USER
+          - name: DATABASE
+            valueFrom:
+              secretKeyRef:
+                name: app-config
+                key: DATABASE
+          - name: DB_HOST
+            valueFrom:
+              secretKeyRef:
+                name: app-config
+                key: DB_HOST
+          - name: SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: app-config
+                key: SECRET_KEY
+          - name: DEBUG
+            valueFrom:
+              secretKeyRef:
+                name: app-config
+                key: DEBUG
+          - name: ALLOWED_HOSTS
+            valueFrom:
+              secretKeyRef:
+                name: app-config
+                key: ALLOWED_HOSTS

@@ -1,0 +1,8 @@
+#!/bin/bash
+kubectl delete -f kubernetes/nhlstats_ingress.yaml
+kubectl delete -f kubernetes/nhlstats_service.yaml
+kubectl delete -f kubernetes/nhlstats_deployment.yaml
+kubectl delete -f kubernetes/pg_service.yaml
+kubectl delete -f kubernetes/pg_deployment.yaml
+kubectl delete -n nhlstats secret app-config
+kubectl delete -f kubernetes/nhlstats_namespace.yaml

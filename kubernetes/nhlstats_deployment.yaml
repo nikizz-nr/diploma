@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nhlstats-web
+  namespace: nhlstats
+  labels:
+    app: nhlstats-web
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nhlstats-web
+  template:
+    metadata:
+      labels:
+        app: nhlstats-web
+    spec:
+      containers:
+      - image: nhlstats:latest
+        imagePullPolicy: IfNotPresent
+        name: nhlstats
+        ports:
+        - containerPort: 8000
+        env:
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: app-config
+                key: POSTGRES_PASSWORD
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                name: app-config
+                key: POSTGRES_USER
+          - name: POSTGRES_DB
+            valueFrom:
+              secretKeyRef:
+                name: app-config
+                key: POSTGRES_DATABASE
+          - name: SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: app-config
+                key: SECRET_KEY
+          - name: DEBUG
+            valueFrom:
+              secretKeyRef:
+                name: app-config
+                key: DEBUG
+          - name: ALLOWED_HOSTS
+            valueFrom:
+              secretKeyRef:
+                name: app-config
+                key: ALLOWED_HOSTS
+      initContainers:
+        - name: init-db-service
+          image: busybox:1.28
+          command: ['sh', '-c', "until nslookup database.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for database service; sleep 2; done"]
+        - name: init-check-db
+          image: busybox:1.28
+          command: ['sh', '-c', "while ! nc -z database 5432; do echo waiting for database; sleep 2; done"]

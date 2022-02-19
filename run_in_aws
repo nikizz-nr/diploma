@@ -1,0 +1,5 @@
+#!/bin/bash
+kubectl apply -f eks/nhlstats_namespace.yaml
+kubectl create secret generic app-config --from-env-file=.env.kuber -n nhlstats
+kubectl apply -f eks/nhlstats_deployment.yaml
+kubectl apply -f eks/nhlstats_service.yaml

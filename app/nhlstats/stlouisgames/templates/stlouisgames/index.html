@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load django_bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    <meta charset="UTF-8">
+    <title>NHL games in St.Louis</title>
+</head>
+<body>
+    {% block bootstrap5_content %}
+        <nav class="navbar navbar-expand-lg navbar-light bg-secondary bg-gradient">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarMain">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <form action="/" method="post">
+                                {% csrf_token %}
+                                <button class="btn btn-secondary border-light" type="submit">Update data</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+                <h2 class="text-white">Games in St. Louis during {{ start_date }} - {{ end_date }}</h2>
+            </div>
+        </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <h5 >Stats table</h5>
+                <table class="table table-bordered table-light table-striped">
+                    <tr>
+                        <th rowspan="2">Date</th>
+                        <th rowspan="2">Home Team</th>
+                        <th rowspan="2">Away Team</th>
+                        <th rowspan="2">Score</th>
+                        <th colspan="2">1st Time on ice</th>
+                        <th colspan="2">2nd Time on ice</th>
+                        <th colspan="2">3rd Time on ice</th>
+                    </tr>
+                    <tr colspan="2">
+                        <th>Name</th>
+                        <th>Time</th>
+                        <th>Name</th>
+                        <th>Time</th>
+                        <th>Name</th>
+                        <th>Time</th>
+                    </tr>
+                    {% for row in data%}
+                        <tr>
+                            <td>{{ row.date }}</td>
+                            <td>{{ row.home }}</td>
+                            <td>{{ row.away }}</td>
+                            <td>{{ row.score }}</td>
+                            <td>{{ row.first }}</td>
+                            <td>{{ row.first_time }}</td>
+                            <td>{{ row.second }}</td>
+                            <td>{{ row.second_time }}</td>
+                            <td>{{ row.third }}</td>
+                            <td>{{ row.third_time }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            <div class="col-3">
+                <h5 >Top 3 time on ice players</h5>
+                <table class="table table-bordered table-light table-striped">
+                    <tr>
+                        <th>Full name</th>
+                        <th>Time on Ice</th>
+                    </tr>
+                    <tr>
+                        <td>{{ top3.first }}</td>
+                        <td>{{ top3.first_time }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ top3.second }}</td>
+                        <td>{{ top3.second_time }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ top3.third }}</td>
+                        <td>{{ top3.third_time }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+    </body>
+</html>

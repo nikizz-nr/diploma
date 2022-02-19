@@ -16,7 +16,7 @@ spec:
         app: nhlstats-web
     spec:
       containers:
-      - image: todo:fill_me
+      - image: nhlstats:latest
         imagePullPolicy: Always
         name: nhlstats
         ports:

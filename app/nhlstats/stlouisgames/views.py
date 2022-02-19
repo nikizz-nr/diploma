@@ -4,9 +4,13 @@ from django.http import Http404
 
 
 def index(request):
-    # TODO Change static dates for calculated
-    start_date = "2021-02-01"
-    end_date = "2021-02-28"
+    today = datetime.today()
+    if today.month == 1:
+        start_date = today.replace(month=12, year=today.year-1, day=1)
+    else:
+        start_date = today.replace(month=today.month-1)
+    end_date = start_date.replace(day=monthrange(start_date.year, start_date.month)[1]).strftime('%Y-%m-%d')
+    start_date = start_date.strftime('%Y-%m-%d')
     if request.method == 'POST':
         Game.get_stlouis_games(start_date, end_date)
         Game.update_game_stats()

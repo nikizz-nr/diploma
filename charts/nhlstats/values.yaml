@@ -1,0 +1,5 @@
+namespace: staging
+replicas: 3
+image: nhlstats
+tag: latest
+imagePullPolicy: IfNotPresent

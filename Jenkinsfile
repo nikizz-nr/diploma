@@ -32,5 +32,12 @@ spec:
                 }
             }
         }
+        stage('Print env') {
+            steps {
+                script {
+                    sh "printenv"
+                }
+            }
+        }
     }
 }

@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('Build image') {
             steps {
-                container('dind') {
+                container('docker-dind') {
                     sh "docker build -t nhlstats:$BUILD_NUMBER -f docker/Dockerfile.app ."
                 }
             }

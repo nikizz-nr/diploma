@@ -1,4 +1,4 @@
-FROM python:3.9-alpine
+FROM python:3.9-alpine12
 
 ENV PYTHONDONTWRITEBYTECODE 1
 

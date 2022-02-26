@@ -4,7 +4,8 @@
 - [x] Strategy: GitLab Flow selected
 - [x] Dockerfile
 - [x] AWS compatible deployment
-- [ ] IaC
+- [x] IaC
 - [ ] CI/CD with Jenkins
+- [ ] CodeGate
 - [ ] Monitoring
 - [ ] Logs

@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from .models import Game
 from django.http import Http404
+from datetime import datetime
+from calendar import monthrange
 
 
 def index(request):
@@ -8,7 +10,7 @@ def index(request):
     if today.month == 1:
         start_date = today.replace(month=12, year=today.year-1, day=1)
     else:
-        start_date = today.replace(month=today.month-1)
+        start_date = today.replace(month=today.month-1, day=1)
     end_date = start_date.replace(day=monthrange(start_date.year, start_date.month)[1]).strftime('%Y-%m-%d')
     start_date = start_date.strftime('%Y-%m-%d')
     if request.method == 'POST':

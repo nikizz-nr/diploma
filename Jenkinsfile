@@ -24,10 +24,13 @@ spec:
 """
         }
     }
+    environment { 
+        STEXT = credentials('secret_text') 
+    }
     stages {
         stage('Build image') {
             steps {
-                container('docker-dind') {
+                container('dind') {
                     sh "docker build -t nhlstats:$BUILD_NUMBER -f docker/Dockerfile.app ."
                 }
             }

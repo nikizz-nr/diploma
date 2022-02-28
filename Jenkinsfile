@@ -1,41 +1,38 @@
 pipeline {
-    agent {
-        kubernetes {
-            yaml """
-apiVersion: v1
-kind: Pod
-metadata:
-  labels:
-    some-label: dind-agent
-spec:
-  containers:
-  - name: dind
-    image: docker:20.10.12-dind
-    imagePullPolicy: Always
-    tty: true
-    securityContext:
-      privileged: true
-    volumeMounts:
-      - name: docker-graph-storage
-        mountPath: /var/lib/docker
-  volumes:
-    - name: docker-graph-storage
-      emptyDir: {}
-"""
-        }
+    agent any
+    environment { 
+        ECR_URL = credentials('ecr-url')
+        ECR_REGISTRY = credentials('ecr-registry')
     }
     stages {
         stage('Build image') {
+            when {
+                anyOf {
+                    expression{env.BRANCH_NAME == 'main'}
+                    expression{env.BRANCH_NAME == 'production'}
+                }
+            }
             steps {
-                container('dind') {
-                    sh "docker build -t nhlstats:$BUILD_NUMBER -f docker/Dockerfile.app ."
+                container('docker-dind') {
+                    script {
+                        withDockerRegistry(url: "${env.ECR_URL}", credentialsId: 'ecr-creds') {
+                            def image = docker.build("${env.ECR_REGISTRY}:${env.GIT_COMMIT}", "-f docker/Dockerfile.app .")
+                            image.push()
+                            if (env.BRANCH_NAME == 'main') {
+                                image.push('latest')
+                            }
+                            if (env.BRANCH_NAME == 'production') {
+                                image.push('stable')
+                            }
+                        }
+                    }
                 }
             }
         }
-        stage('Print env') {
+        stage('Print message') {
             steps {
                 script {
-                    sh "printenv"
+                    echo "Success build!"
                 }
             }
         }

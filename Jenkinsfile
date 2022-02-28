@@ -1,20 +1,24 @@
 pipeline {
     agent any
     environment { 
-        STEXT = credentials('ecr-url') 
+        ECR_URL = credentials('ecr-url')
+        ECR_REGISTRY = credentials('ecr-registry')
     }
     stages {
         stage('Build image') {
             steps {
                 container('docker-dind') {
-                    sh "docker build -t nhlstats:$BUILD_NUMBER -f docker/Dockerfile.app ."
+                    withDockerRegistry(url: "${env.ECR_URL}", credentialsId: 'ecr-creds') {
+                        def image = docker.build("${env.ECR_REGISTRY}:${env.GIT_COMMIT}")
+                        image.push()
+                    }
                 }
             }
         }
         stage('Print env') {
             steps {
                 script {
-                    sh "printenv"
+                    echo "Success!"
                 }
             }
         }

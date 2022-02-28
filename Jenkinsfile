@@ -8,9 +8,11 @@ pipeline {
         stage('Build image') {
             steps {
                 container('docker-dind') {
-                    withDockerRegistry(url: "${env.ECR_URL}", credentialsId: 'ecr-creds') {
-                        def image = docker.build("${env.ECR_REGISTRY}:${env.GIT_COMMIT}")
-                        image.push()
+                    script {
+                        withDockerRegistry(url: "${env.ECR_URL}", credentialsId: 'ecr-creds') {
+                            def image = docker.build("${env.ECR_REGISTRY}:${env.GIT_COMMIT}")
+                            image.push()
+                        }
                     }
                 }
             }

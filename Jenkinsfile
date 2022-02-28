@@ -6,19 +6,23 @@ pipeline {
     }
     stages {
         stage('Build image') {
+            when {
+                anyOf {
+                    expression{env.BRANCH_NAME == 'main'}
+                    expression{env.BRANCH_NAME == 'production'}
+                }
+            }
             steps {
                 container('docker-dind') {
                     script {
-                        if (env.BRANCH_NAME == 'main') || (env.BRANCH_NAME == 'production') {
-                            withDockerRegistry(url: "${env.ECR_URL}", credentialsId: 'ecr-creds') {
-                                def image = docker.build("${env.ECR_REGISTRY}:${env.GIT_COMMIT}", "-f docker/Dockerfile.app .")
-                                image.push()
-                                if (env.BRANCH_NAME == 'main') {
-                                    image.push('latest')
-                                }
-                                if (env.BRANCH_NAME == 'production') {
-                                    image.push('stable')
-                                }
+                        withDockerRegistry(url: "${env.ECR_URL}", credentialsId: 'ecr-creds') {
+                            def image = docker.build("${env.ECR_REGISTRY}:${env.GIT_COMMIT}", "-f docker/Dockerfile.app .")
+                            image.push()
+                            if (env.BRANCH_NAME == 'main') {
+                                image.push('latest')
+                            }
+                            if (env.BRANCH_NAME == 'production') {
+                                image.push('stable')
                             }
                         }
                     }

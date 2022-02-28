@@ -32,7 +32,7 @@ pipeline {
         stage('Print success!') {
             steps {
                 script {
-                    echo "Success build!"
+                    echo "Success build and update status!"
                 }
             }
         }

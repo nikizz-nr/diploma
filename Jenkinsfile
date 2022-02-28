@@ -9,16 +9,23 @@ pipeline {
             steps {
                 container('docker-dind') {
                     script {
-                        sh 'ls -l'
-                        withDockerRegistry(url: "${env.ECR_URL}", credentialsId: 'ecr-creds') {
-                            def image = docker.build("${env.ECR_REGISTRY}:${env.GIT_COMMIT}", "-f docker/Dockerfile.app .")
-                            image.push()
+                        if (env.BRANCH_NAME == 'main') || (env.BRANCH_NAME == 'production') {
+                            withDockerRegistry(url: "${env.ECR_URL}", credentialsId: 'ecr-creds') {
+                                def image = docker.build("${env.ECR_REGISTRY}:${env.GIT_COMMIT}", "-f docker/Dockerfile.app .")
+                                image.push()
+                                if (env.BRANCH_NAME == 'main') {
+                                    image.push('latest')
+                                }
+                                if (env.BRANCH_NAME == 'production') {
+                                    image.push('stable')
+                                }
+                            }
                         }
                     }
                 }
             }
         }
-        stage('Print env') {
+        stage('Print success!') {
             steps {
                 script {
                     echo "Success!"

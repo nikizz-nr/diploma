@@ -29,7 +29,7 @@ pipeline {
                 }
             }
         }
-        stage('Print success!') {
+        stage('Print message') {
             steps {
                 script {
                     echo "Success build!"

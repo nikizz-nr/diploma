@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment { 
-        STEXT = credentials('secret_text') 
+        STEXT = credentials('ecr-url') 
     }
     stages {
         stage('Build image') {

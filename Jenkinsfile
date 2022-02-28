@@ -9,6 +9,7 @@ pipeline {
             steps {
                 container('docker-dind') {
                     script {
+                        sh 'ls -l'
                         withDockerRegistry(url: "${env.ECR_URL}", credentialsId: 'ecr-creds') {
                             def image = docker.build("${env.ECR_REGISTRY}:${env.GIT_COMMIT}")
                             image.push()

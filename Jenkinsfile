@@ -29,6 +29,15 @@ pipeline {
                 }
             }
         }
+        stage('kubeops') {
+            steps {
+                container('k8s-control') {
+                    script {
+                        sh 'kubectl get ns'
+                    }
+                }
+            }
+        }
         stage('Print message') {
             steps {
                 script {

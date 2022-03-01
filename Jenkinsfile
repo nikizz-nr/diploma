@@ -32,9 +32,7 @@ pipeline {
         stage('kubeops') {
             steps {
                 container('k8s-control') {
-                    script {
-                        sh 'kubectl get ns'
-                    }
+                    sh "kubectl get ns"
                 }
             }
         }

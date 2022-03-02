@@ -7,7 +7,7 @@ pipeline {
     stages {
         stage('Qualitygate') {
             environment {
-                SCANNER_HOME = tool 'SonarQubeScanner'
+                SCANNER_HOME = tool 'sscanner'
                 PROJECT_NAME = "nhlstats"
             }
             steps {

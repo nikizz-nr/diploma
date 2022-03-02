@@ -5,6 +5,17 @@ pipeline {
         ECR_REGISTRY = credentials('ecr-registry')
     }
     stages {
+        stage('Qualitygate') {
+            environment {
+                SCANNER_HOME = tool 'SonarQubeScanner'
+                PROJECT_NAME = "nhlstats"
+            }
+            steps {
+                withSonarQubeEnv(installationName: 'sq-1', credentialsId: 'sq') {
+                    sh "${SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectKey=${PROJECT_NAME}"
+                }
+            }
+        }
         stage('Build image') {
             when {
                 anyOf {

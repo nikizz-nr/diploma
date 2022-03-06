@@ -44,7 +44,7 @@ pipeline {
             environment {
                 DB_USER=credentials('db-user')
                 DB_PASSWORD=credentials('db-password')
-                DB_HOST=credentials('db-host')
+                MYSQL_HOST=credentials('db-host')
                 DATABASE=credentials('database')
             }
             // when {
@@ -55,8 +55,8 @@ pipeline {
             steps {
                 container('mysql') {
                     script {
-                        mysql -h${env.DB_HOST} -u${env.DB_USER} -p${env.DB_PASSWORD} -e "drop database if exists ${env.DATABASE}-dev";
-                        mysql -h${env.DB_HOST} -u${env.DB_USER} -p${env.DB_PASSWORD} -e "create database ${env.DATABASE}-dev";
+                        sh "mysql --user=${env.DB_USER} --password=${env.DB_PASSWORD} --host=${env.DB_HOST} -e \\\"drop database if exists ${env.DATABASE}-dev\\\"";
+                        sh "mysql --user=${env.DB_USER} --password=${env.DB_PASSWORD} --host=${env.DB_HOST} -e \\\"create database ${env.DATABASE}-dev\\\"";
                     }
                 }
             }

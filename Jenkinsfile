@@ -41,6 +41,12 @@ pipeline {
             }
         }
         stage('database_update') {
+            environment {
+                DB_USER=credentials('db-user')
+                DB_PASSWORD=credentials('db-password')
+                DB_HOST=credentials('db-host')
+                DATABASE=credentials('database')
+            }
             // when {
             //     anyOf {
             //         expression{env.BRANCH_NAME == 'main'}
@@ -49,7 +55,8 @@ pipeline {
             steps {
                 container('mysql') {
                     script {
-                        sh "mysqldump --version"
+                        sh "mysql -h ${env.DB_HOST} -u ${env.DB_USER} -p${env.DB_PASSWORD} -e \"create drop ${env.DATABASE}-dev\""
+                        sh "mysql -h ${env.DB_HOST} -u ${env.DB_USER} -p${env.DB_PASSWORD} -e \"create database ${env.DATABASE}-dev\""
                     }
                 }
             }

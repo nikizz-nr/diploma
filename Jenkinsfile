@@ -62,10 +62,9 @@ pipeline {
                         // sh "echo \"password=${env.DB_PASSWORD}\" >> mysql_connect.cf"
                         // sh "cat mysql_connect.cf"
                         sh "echo \"#!/bin/bash\" > updatedb.sh"
-                        sh "echo \"mysql -h${env.DB_HOST} -u${env.DB_USER} -p${env.DB_PASSWORD} -e \\\"DROP DATABASE IF EXISTS nhlstats-dev\\\";\" >> updatedb.sh"
-                        sh "echo \"mysql -h${env.DB_HOST} -u${env.DB_USER} -p${env.DB_PASSWORD} -e \\\"CREATE DATABASE nhlstats-dev\\\";\" >> updatedb.sh"
+                        sh "echo \"mysql -h${env.DB_HOST} -u${env.DB_USER} -p${env.DB_PASSWORD} -e \\\"DROP DATABASE IF EXISTS nhlstats-dev;\\\";\" >> updatedb.sh"
+                        sh "echo \"mysql -h${env.DB_HOST} -u${env.DB_USER} -p${env.DB_PASSWORD} -e \\\"CREATE DATABASE nhlstats-dev;\\\"\" >> updatedb.sh"
                         sh "cat updatedb.sh"
-                        sh "sleep 300"
                         sh "chmod +x updatedb.sh"
                         sh "./updatedb.sh"
                     }

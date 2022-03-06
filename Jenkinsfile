@@ -66,12 +66,19 @@ pipeline {
                         sh "echo \"mysql -h${env.DB_HOST} -u${env.DB_USER} -p${env.DB_PASSWORD} -e \\\"CREATE DATABASE nhlstats-dev;\\\"\" >> updatedb.sh"
                         sh "cat updatedb.sh"
                         sh "chmod +x updatedb.sh"
+                        sh "sleep 600"
                         sh "./updatedb.sh"
                     }
                 }
             }
         }
         stage('kubeops') {
+            when {
+                anyOf {
+                    expression{env.BRANCH_NAME == 'main'}
+                    expression{env.BRANCH_NAME == 'production'}
+                }
+            }
             steps {
                 container('k8s-control') {
                     script {

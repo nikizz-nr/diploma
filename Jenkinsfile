@@ -5,17 +5,17 @@ pipeline {
         ECR_REGISTRY = credentials('ecr-registry')
     }
     stages {
-        stage('Qualitygate') {
-            environment {
-                SCANNER_HOME = tool 'sscanner'
-                PROJECT_NAME = "nhlstats"
-            }
-            steps {
-                withSonarQubeEnv(installationName: 'sq-1', credentialsId: 'sq') {
-                    sh "${SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectKey=${PROJECT_NAME}"
-                }
-            }
-        }
+        // stage('Qualitygate') {
+        //     environment {
+        //         SCANNER_HOME = tool 'sscanner'
+        //         PROJECT_NAME = "nhlstats"
+        //     }
+        //     steps {
+        //         withSonarQubeEnv(installationName: 'sq-1', credentialsId: 'sq') {
+        //             sh "${SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectKey=${PROJECT_NAME}"
+        //         }
+        //     }
+        // }
         stage('Build image') {
             when {
                 anyOf {
@@ -55,15 +55,15 @@ pipeline {
             steps {
                 container('mysql') {
                     script {
-                        sh "echo \"[mysqld]\" > mysql_connect.cf"
-                        sh "echo \"[client]\" >> mysql_connect.cf"
-                        sh "echo \"host=${env.DB_HOST}\" >> mysql_connect.cf"
-                        sh "echo \"user=${env.DB_USER}\" >> mysql_connect.cf"
-                        sh "echo \"password=${env.DB_PASSWORD}\" >> mysql_connect.cf"
-                        sh "cat mysql_connect.cf"
+                        // sh "echo \"[mysqld]\" > mysql_connect.cf"
+                        // sh "echo \"[client]\" >> mysql_connect.cf"
+                        // sh "echo \"host=${env.DB_HOST}\" >> mysql_connect.cf"
+                        // sh "echo \"user=${env.DB_USER}\" >> mysql_connect.cf"
+                        // sh "echo \"password=${env.DB_PASSWORD}\" >> mysql_connect.cf"
+                        // sh "cat mysql_connect.cf"
                         sh "echo \"#!/bin/bash\" > updatedb.sh"
-                        sh "echo \"mysql --defaults-extra-file=mysql_connect.cf -e \\\"drop database if exists 'nhlstats-dev'\\\"\" >> updatedb.sh"
-                        sh "echo \"mysql --defaults-extra-file=mysql_connect.cf -e \\\"create database 'nhlstats-dev'\\\"\" >> updatedb.sh"
+                        sh "echo \"mysql -h${env.DB_HOST} -u${env.DB_USER} -p${env.DB_PASSWORD} -e \\\"DROP DATABASE IF EXISTS nhlstats-dev\\\";\" >> updatedb.sh"
+                        sh "echo \"mysql -h${env.DB_HOST} -u${env.DB_USER} -p${env.DB_PASSWORD} -e \\\"CREATE DATABASE nhlstats-dev\\\";\" >> updatedb.sh"
                         sh "cat updatedb.sh"
                         sh "chmod +x updatedb.sh"
                         sh "./updatedb.sh"

@@ -78,7 +78,7 @@ pipeline {
                             sh "helm -n staging install diploma diploma/nhlstats --set image=${env.ECR_REGISTRY}"
                         }
                         if (env.BRANCH_NAME == 'production') {
-                            sh "helm -n production install diploma diploma/nhlstats --set image=${env.ECR_REGISTRY} --set tag=stable --set nodeport=32221"
+                            sh "helm -n production install diploma diploma/nhlstats --set namespace=production --set image=${env.ECR_REGISTRY} --set tag=stable --set nodeport=32221"
                         }
                     }
                 }

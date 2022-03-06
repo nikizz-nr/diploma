@@ -55,10 +55,11 @@ pipeline {
             steps {
                 container('mysql') {
                     script {
-                        sh "echo \\\"[client]\\\" > mysql_connect.cf"
-                        sh "echo \\\"host=${env.DB_HOST}\\\" >> mysql_connect.cf"
-                        sh "echo \\\"user=${env.DB_USER}\\\" >> mysql_connect.cf"
-                        sh "echo \\\"password=${env.DB_PASSWORD}\\\" >> mysql_connect.cf"
+                        sh "echo \"[mysqld]\" > mysql_connect.cf"
+                        sh "echo \"[client]\" >> mysql_connect.cf"
+                        sh "echo \"host=${env.DB_HOST}\" >> mysql_connect.cf"
+                        sh "echo \"user=${env.DB_USER}\" >> mysql_connect.cf"
+                        sh "echo \"password=${env.DB_PASSWORD}\" >> mysql_connect.cf"
                         sh "cat mysql_connect.cf"
                         sh "mysql --defaults-extra-file=mysql_connect.cf -e \\\"drop database if exists ${env.DATABASE}-dev\\\"";
                         sh "mysql --defaults-extra-file=mysql_connect.cf -e \\\"create database ${env.DATABASE}-dev\\\"";

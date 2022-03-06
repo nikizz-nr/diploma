@@ -3,4 +3,4 @@ replicas: 3
 image: nhlstats
 tag: latest
 imagePullPolicy: IfNotPresent
-nodeport: 32221
+nodeport: 32222

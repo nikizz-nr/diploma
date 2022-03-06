@@ -61,7 +61,7 @@ pipeline {
                         // sh "echo \"user=${env.DB_USER}\" >> mysql_connect.cf"
                         // sh "echo \"password=${env.DB_PASSWORD}\" >> mysql_connect.cf"
                         // sh "cat mysql_connect.cf"
-                        sh "mysql -h${env.DB_HOST} -u${env.DB_USER} -p${env.DB_PASSWORD} -e \\\"DROP DATABASE IF EXISTS nhlstats_dev;\\\";"
+                        sh "mysql -h${env.DB_HOST} -u${env.DB_USER} -p${env.DB_PASSWORD} -e \\\"DROP DATABASE IF EXISTS nhlstats_dev;\\\""
                         sh "mysql -h${env.DB_HOST} -u${env.DB_USER} -p${env.DB_PASSWORD} -e \\\"CREATE DATABASE nhlstats_dev;\\\""
                     }
                 }
@@ -77,7 +77,8 @@ pipeline {
             steps {
                 container('k8s-control') {
                     script {
-                        sh 'kubectl get ns'
+                        sh 'helm repo add diploma https://nikizz-nr.github.io/diploma/'
+                        sh 'echo "1"'
                     }
                 }
             }

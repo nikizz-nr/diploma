@@ -75,10 +75,10 @@ pipeline {
                     script {
                         sh 'helm repo add diploma https://nikizz-nr.github.io/diploma/'
                         if (env.BRANCH_NAME == 'main') {
-                            sh "helm -n staging install diploma diploma/nhlstats --set image=${env.ECR_REGISTRY}/nhlstats"
+                            sh "helm -n staging install diploma diploma/nhlstats --set image=${env.ECR_REGISTRY}"
                         }
                         if (env.BRANCH_NAME == 'production') {
-                            sh "helm -n production install diploma diploma/nhlstats --set image=${env.ECR_REGISTRY}/nhlstats --set tag=stable --set nodeport=32221"
+                            sh "helm -n production install diploma diploma/nhlstats --set image=${env.ECR_REGISTRY} --set tag=stable --set nodeport=32221"
                         }
                     }
                 }

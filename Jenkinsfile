@@ -55,9 +55,6 @@ pipeline {
                 sh "mysqldump --version"
             }
         }
-    }
-            }
-        }
         stage('kubeops') {
             steps {
                 container('k8s-control') {

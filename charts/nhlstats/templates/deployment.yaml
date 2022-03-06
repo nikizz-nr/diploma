@@ -2,11 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nhlstats-web
-  namespace: nhlstats
+  namespace: {{ .Values.namespace }}
   labels:
     app: nhlstats-web
 spec:
-  replicas: 3
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
       app: nhlstats-web
@@ -16,8 +16,8 @@ spec:
         app: nhlstats-web
     spec:
       containers:
-      - image: nhlstats:latest
-        imagePullPolicy: Always
+      - image: {{ .Values.image }}:{{ .Values.tag }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
         name: nhlstats
         ports:
         - containerPort: 8000

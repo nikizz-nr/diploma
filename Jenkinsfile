@@ -55,18 +55,12 @@ pipeline {
             steps {
                 container('mysql') {
                     script {
-                        // sh "echo \"[mysqld]\" > mysql_connect.cf"
-                        // sh "echo \"[client]\" >> mysql_connect.cf"
-                        // sh "echo \"host=${env.DB_HOST}\" >> mysql_connect.cf"
-                        // sh "echo \"user=${env.DB_USER}\" >> mysql_connect.cf"
-                        // sh "echo \"password=${env.DB_PASSWORD}\" >> mysql_connect.cf"
-                        // sh "cat mysql_connect.cf"
                         sh "echo \"#!/bin/bash\" > updatedb.sh"
-                        sh "echo \"mysql -h${env.DB_HOST} -u${env.DB_USER} -p${env.DB_PASSWORD} -e \\\"DROP DATABASE IF EXISTS nhlstats_dev;\\\"\" >> updatedb.sh"
-                        sh "echo \"mysql -h${env.DB_HOST} -u${env.DB_USER} -p${env.DB_PASSWORD} -e \\\"CREATE DATABASE nhlstats_dev\\\"\" >> updatedb.sh"
-                        sh "cat ./updatedb.sh"
-                        sh "chmod +x updatedb.sh"
-                        sh "./updatedb.sh"
+                        sh "echo \"mysql -h${env.DB_HOST} -u${env.DB_USER} -p${env.DB_PASSWORD} -e \\\"DROP DATABASE IF EXISTS ${env.DATABASE}_dev;\\\"\" >> updatedb.sh"
+                        sh "echo \"mysql -h${env.DB_HOST} -u${env.DB_USER} -p${env.DB_PASSWORD} -e \\\"CREATE DATABASE ${env.DATABASE}_dev\\\"\" >> updatedb.sh"
+                        // sh "cat ./updatedb.sh"
+                        // sh "chmod +x updatedb.sh"
+                        sh "/bin/bash ./updatedb.sh"
                     }
                 }
             }
@@ -82,7 +76,12 @@ pipeline {
                 container('k8s-control') {
                     script {
                         sh 'helm repo add diploma https://nikizz-nr.github.io/diploma/'
-                        sh 'helm install diploma nhlstats'
+                        if (env.BRANCH_NAME == 'main') {
+                            sh 'helm -n staging install diploma nhlstats --set nodeport=32222'
+                        }
+                        if (env.BRANCH_NAME == 'production') {
+                            sh 'helm -n production install diploma nhlstats --set tag=stable'
+                        }
                     }
                 }
             }

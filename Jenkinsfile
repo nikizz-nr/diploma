@@ -44,7 +44,7 @@ pipeline {
             environment {
                 DB_USER=credentials('db-user')
                 DB_PASSWORD=credentials('db-password')
-                MYSQL_HOST=credentials('db-host')
+                DB_HOST=credentials('db-host')
                 DATABASE=credentials('database')
             }
             // when {
@@ -55,8 +55,13 @@ pipeline {
             steps {
                 container('mysql') {
                     script {
-                        sh "mysql --user=${env.DB_USER} --password=${env.DB_PASSWORD} --host=${env.DB_HOST} -e \\\"drop database if exists ${env.DATABASE}-dev\\\"";
-                        sh "mysql --user=${env.DB_USER} --password=${env.DB_PASSWORD} --host=${env.DB_HOST} -e \\\"create database ${env.DATABASE}-dev\\\"";
+                        sh "echo \\\"[client]\\\" > mysql_connect.cf"
+                        sh "echo \\\"host=${env.DB_HOST}\\\" >> mysql_connect.cf"
+                        sh "echo \\\"user=${env.DB_USER}\\\" >> mysql_connect.cf"
+                        sh "echo \\\"password=${env.DB_PASSWORD}\\\" >> mysql_connect.cf"
+                        sh "cat mysql_connect.cf"
+                        sh "mysql --defaults-extra-file=mysql_connect.cf -e \\\"drop database if exists ${env.DATABASE}-dev\\\"";
+                        sh "mysql --defaults-extra-file=mysql_connect.cf -e \\\"create database ${env.DATABASE}-dev\\\"";
                     }
                 }
             }

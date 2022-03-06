@@ -46,13 +46,12 @@ pipeline {
             //         expression{env.BRANCH_NAME == 'main'}
             //     }
             // }
-            agent {
-                docker {
-                    image 'mysql:latest'
-                }
-            }
             steps {
-                sh "mysqldump --version"
+                container('mysql') {
+                    script {
+                        sh "mysqldump --version"
+                    }
+                }
             }
         }
         stage('kubeops') {

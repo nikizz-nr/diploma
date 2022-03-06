@@ -55,7 +55,7 @@ pipeline {
             steps {
                 container('mysql') {
                     script {
-                        sh "mysql -h ${env.DB_HOST} -u ${env.DB_USER} -p${env.DB_PASSWORD} -e \\\"drop ${env.DATABASE}-dev\\\""
+                        sh "mysql -h ${env.DB_HOST} -u ${env.DB_USER} -p${env.DB_PASSWORD} -e \\\"drop databae if exists ${env.DATABASE}-dev\\\""
                         sh "mysql -h ${env.DB_HOST} -u ${env.DB_USER} -p${env.DB_PASSWORD} -e \\\"create database ${env.DATABASE}-dev\\\""
                     }
                 }

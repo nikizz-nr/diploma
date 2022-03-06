@@ -40,6 +40,24 @@ pipeline {
                 }
             }
         }
+        stage('database_update') {
+            // when {
+            //     anyOf {
+            //         expression{env.BRANCH_NAME == 'main'}
+            //     }
+            // }
+            agent {
+                docker {
+                    image 'mysql:latest'
+                }
+            }
+            steps {
+                sh "mysqldump --version"
+            }
+        }
+    }
+            }
+        }
         stage('kubeops') {
             steps {
                 container('k8s-control') {

@@ -58,7 +58,7 @@ pipeline {
                         sh "echo \"#!/bin/bash\" > updatedb.sh"
                         sh "echo \"mysql -h${env.DB_HOST} -u${env.DB_USER} -p${env.DB_PASSWORD} -e \\\"DROP DATABASE IF EXISTS ${env.DATABASE}_dev;\\\"\" >> updatedb.sh"
                         sh "echo \"mysql -h${env.DB_HOST} -u${env.DB_USER} -p${env.DB_PASSWORD} -e \\\"CREATE DATABASE ${env.DATABASE}_dev\\\"\" >> updatedb.sh"
-                        sh "echo \"mysqldump -h${env.DB_HOST} -u${env.DB_USER} -p${env.DB_PASSWORD} -d ${env.DATABASE} > schema.sql\" >> updatedb.sh"
+                        sh "echo \"mysqldump -h${env.DB_HOST} -u${env.DB_USER} -p${env.DB_PASSWORD} -d ${env.DATABASE} --set-gtid-purged=OFF > schema.sql\" >> updatedb.sh"
                         sh "echo \"mysql -h${env.DB_HOST} -u${env.DB_USER} -p${env.DB_PASSWORD} ${env.DATABASE}_dev < schema.sql\" >> updatedb.sh"
                         sh "/bin/bash ./updatedb.sh"
                     }

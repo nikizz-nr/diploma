@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment { 
         ECR_URL = credentials('ecr-url')
-        ECR_REGISTRY = credentials('ecr-registry')
+        ECR_IMAGE = credentials('ecr-image')
     }
     stages {
         stage('Qualitygate') {
@@ -27,7 +27,7 @@ pipeline {
                 container('docker-dind') {
                     script {
                         withDockerRegistry(url: "${env.ECR_URL}", credentialsId: 'ecr-creds') {
-                            def image = docker.build("${env.ECR_REGISTRY}:${env.GIT_COMMIT}", "-f docker/Dockerfile.app .")
+                            def image = docker.build("${env.ECR_IMAGE}:${env.GIT_COMMIT}", "-f docker/Dockerfile.app .")
                             image.push()
                             if (env.BRANCH_NAME == 'main') {
                                 image.push('latest')
@@ -58,6 +58,8 @@ pipeline {
                         sh "echo \"#!/bin/bash\" > updatedb.sh"
                         sh "echo \"mysql -h${env.DB_HOST} -u${env.DB_USER} -p${env.DB_PASSWORD} -e \\\"DROP DATABASE IF EXISTS ${env.DATABASE}_dev;\\\"\" >> updatedb.sh"
                         sh "echo \"mysql -h${env.DB_HOST} -u${env.DB_USER} -p${env.DB_PASSWORD} -e \\\"CREATE DATABASE ${env.DATABASE}_dev\\\"\" >> updatedb.sh"
+                        sh "echo \"mysqldump -h${env.DB_HOST} -u${env.DB_USER} -p${env.DB_PASSWORD} -d ${env.DATABASE} > schema.sql\" >> updatedb.sh"
+                        sh "echo \"mysql -h${env.DB_HOST} -u${env.DB_USER} -p${env.DB_PASSWORD} ${env.DATABASE}_dev < schema.sql\" >> updatedb.sh"
                         sh "/bin/bash ./updatedb.sh"
                     }
                 }
@@ -75,10 +77,10 @@ pipeline {
                     script {
                         sh 'helm repo add diploma https://nikizz-nr.github.io/diploma/'
                         if (env.BRANCH_NAME == 'main') {
-                            sh "helm -n staging install diploma diploma/nhlstats --set image=${env.ECR_REGISTRY}"
+                            sh "helm -n staging upgrade --install diploma diploma/nhlstats --set image=${env.GIT_COMMIT}"
                         }
                         if (env.BRANCH_NAME == 'production') {
-                            sh "helm -n production install diploma diploma/nhlstats --set namespace=production --set image=${env.ECR_REGISTRY} --set tag=stable --set nodeport=32221"
+                            sh "helm -n production upgrade --install diploma diploma/nhlstats --set namespace=production --set image=${env.GIT_COMMIT} --set tag=stable --set nodeport=32221"
                         }
                     }
                 }

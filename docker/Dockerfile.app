@@ -11,7 +11,8 @@ RUN \
  apk add --no-cache mysql-client \
    mariadb-dev \
    mariadb-connector-c-dev \
-   curl &&\
+   curl \
+   stress-ng &&\
  apk add --no-cache --virtual .build-deps gcc \
    musl-dev \
    python3-dev &&\

@@ -1,4 +1,4 @@
-apiVersion: autoscaling/v2
+apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   name: nhlstats-web
@@ -9,10 +9,4 @@ spec:
     name: nhlstats-web
   minReplicas: {{ .Values.replicas }}
   maxReplicas: {{ mul .Values.replicas 2 }}
-  metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 70
+  targetCPUUtilizationPercentage: 70

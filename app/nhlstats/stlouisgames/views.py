@@ -5,6 +5,7 @@ from datetime import datetime
 from calendar import monthrange
 
 
+@require_http_methods(["GET", "POST"])
 def index(request):
     today = datetime.today()
     if today.month == 1:

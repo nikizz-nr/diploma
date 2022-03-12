@@ -3,6 +3,16 @@ entries:
   nhlstats:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2022-03-12T09:52:47.859137899Z"
+    description: Diploma project helm chart
+    digest: 738a77f688d61892b9258566865a04026673ea4072adaffe9304e12cb6a715dd
+    name: nhlstats
+    type: application
+    urls:
+    - https://github.com/nikizz-nr/diploma/releases/download/nhlstats-0.8.1/nhlstats-0.8.1.tgz
+    version: 0.8.1
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2022-03-12T09:09:33.482674472Z"
     description: Diploma project helm chart
     digest: 83d8ca47363033b66838e01332843486a285f307af15014ce3ee225aefecf1cc
@@ -111,4 +121,4 @@ entries:
     urls:
     - https://github.com/nikizz-nr/diploma/releases/download/nhlstats-0.1.0/nhlstats-0.1.0.tgz
     version: 0.1.0
-generated: "2022-03-12T09:09:33.482714972Z"
+generated: "2022-03-12T09:52:47.8593375Z"

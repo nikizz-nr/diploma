@@ -10,16 +10,16 @@ spec:
   selector:
     matchLabels:
       app: nhlstats-web
+  strategy:
+    rollingUpdate:
+      maxSurge: 35%
+      maxUnavailable: 35%
+    type: RollingUpdate
   template:
     metadata:
       labels:
         app: nhlstats-web
     spec:
-      strategy:
-        rollingUpdate:
-          maxSurge: 35%
-          maxUnavailable: 35%
-        type: RollingUpdate
       containers:
       - image: {{ .Values.image }}:{{ .Values.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}

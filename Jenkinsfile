@@ -88,16 +88,4 @@ pipeline {
             }
         }
     }
-    post {
-        success {
-            emailext body: "Pipeline based on commit ${env.GIT_COMMIT} is SUCCESSFUL in ${env.BRANCH_NAME}",
-                subject: "nhlstats in ${env.BRANCH_NAME} SUCCESS",
-                to: "${env.DEVOPS_MAIL}"
-        }
-        failure {
-            emailext body: "Pipeline based on commit ${env.GIT_COMMIT} is FAILED in ${env.BRANCH_NAME}",
-                subject: "nhlstats in ${env.BRANCH_NAME} FAILED",
-                to: "${env.DEVOPS_MAIL}"
-        }
-    }
 }

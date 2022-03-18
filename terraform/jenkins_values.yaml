@@ -1,0 +1,305 @@
+controller:
+  serviceType: NodePort
+  installPlugins:
+    - kubernetes:1.31.3
+    - docker-workflow:1.28
+    - workflow-aggregator:2.6
+    - git:4.10.2
+    - github:1.34.2
+    - github-branch-source:2.11.4
+    - configuration-as-code:1.55.1
+    - email-ext:2.87
+    - job-dsl:1.78.3
+    - sonar:2.14
+  healthProbes: false
+  probes:
+    startupProbe:
+      httpGet:
+        path: '{{ default "" .Values.controller.jenkinsUriPrefix }}/login'
+        port: http
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 12
+      initialDelaySeconds: 120
+    livenessProbe:
+      failureThreshold: 5
+      httpGet:
+        path: '{{ default "" .Values.controller.jenkinsUriPrefix }}/login'
+        port: http
+      periodSeconds: 10
+      timeoutSeconds: 5
+      initialDelaySeconds: 120
+    readinessProbe:
+      failureThreshold: 3
+      httpGet:
+        path: '{{ default "" .Values.controller.jenkinsUriPrefix }}/login'
+        port: http
+      periodSeconds: 10
+      timeoutSeconds: 5
+      initialDelaySeconds: 120
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "256Mi"
+    limits:
+      cpu: "2000m"
+      memory: "1024Mi"
+
+  additionalExistingSecrets:
+    - name: jenkins-creds
+      keyName: mail-address
+    - name: jenkins-creds
+      keyName: mail-password
+    - name: jenkins-creds
+      keyName: devops-mail
+    - name: jenkins-creds
+      keyName: ecr-login
+    - name: jenkins-creds
+      keyName: ecr-password
+    - name: jenkins-creds
+      keyName: ecr-url
+    - name: jenkins-creds
+      keyName: ecr-image
+    - name: jenkins-creds
+      keyName: jenkins-url
+    - name: jenkins-creds
+      keyName: db-host
+    - name: jenkins-creds
+      keyName: db-user
+    - name: jenkins-creds
+      keyName: db-password
+    - name: jenkins-creds
+      keyName: database
+    - name: sq-creds
+      keyName: token
+
+  JCasC:
+    enabled: true
+    defaultConfig: false
+    configScripts:
+      base-config: |
+        jenkins:
+          authorizationStrategy:
+            loggedInUsersCanDoAnything:
+              allowAnonymousRead: false
+          securityRealm:
+            local:
+              allowsSignup: false
+              enableCaptcha: false
+              users:
+              - id: "${chart-admin-username}"
+                name: "Jenkins Admin"
+                password: "${chart-admin-password}"
+          disableRememberMe: false
+          remotingSecurity:
+            enabled: true
+          mode: NORMAL
+          numExecutors: 0
+          labelString: ""
+          projectNamingStrategy: "standard"
+          markupFormatter:
+            plainText
+          clouds:
+          - kubernetes:
+              containerCapStr: "10"
+              defaultsProviderTemplate: ""
+              connectTimeout: "5"
+              readTimeout: "15"
+              jenkinsUrl: "http://jenkins.jenkins.svc.cluster.local:8080"
+              jenkinsTunnel: "jenkins-agent.jenkins.svc.cluster.local:50000"
+              maxRequestsPerHostStr: "32"
+              name: "kubernetes"
+              namespace: "jenkins"
+              serverUrl: "https://kubernetes.default"
+              podLabels:
+              - key: "jenkins/jenkins-jenkins-agent"
+                value: "true"
+              templates:
+                - name: "default"
+                  id: 1d5e7358aa57e8d8fb5290164936179288c8018247360a8e6c5bbd48e05cbb40
+                  containers:
+                  - name: "docker-dind"
+                    alwaysPullImage: false
+                    envVars:
+                      - envVar:
+                          key: "JENKINS_URL"
+                          value: "http://jenkins.jenkins.svc.cluster.local:8080/"
+                      - envVar:
+                          key: "ADMIN_MAIL"
+                          value: "${jenkins-creds-mail-address}"
+                    image: "docker:20.10.12-dind"
+                    privileged: "true"
+                    resourceRequestCpu: 256m
+                    resourceRequestMemory: 512Mi
+                    ttyEnabled: true
+                    workingDir: /home/jenkins/agent
+                  - name: "mysql"
+                    alwaysPullImage: false
+                    args: -c "while true; do sleep 5; done"
+                    command: /bin/bash
+                    envVars:
+                      - envVar:
+                          key: "JENKINS_URL"
+                          value: "http://jenkins.jenkins.svc.cluster.local:8080/"
+                    image: "mysql:latest"
+                    resourceRequestCpu: 128m
+                    resourceRequestMemory: 256Mi
+                    ttyEnabled: true
+                  - name: "k8s-control"
+                    alwaysPullImage: false
+                    args: -c "while true; do sleep 5; done"
+                    command: /bin/bash
+                    envVars:
+                      - envVar:
+                          key: "JENKINS_URL"
+                          value: "http://jenkins.jenkins.svc.cluster.local:8080/"
+                    runAsUser: 0
+                    image: "nikizznr/kubectl-custom:latest"
+                    resourceRequestCpu: 128m
+                    resourceRequestMemory: 256Mi
+                  volumes:
+                    - emptyDirVolume:
+                        mountPath: /var/lib/docker
+                  idleMinutes: 0
+                  instanceCap: 2147483647
+                  label: "jenkins-jenkins-agent "
+                  nodeUsageMode: "NORMAL"
+                  podRetention: Never
+                  showRawYaml: true
+                  serviceAccount: "k8s-control"
+                  slaveConnectTimeoutStr: "100"
+                  yamlMergeStrategy: override
+          crumbIssuer:
+            standard:
+              excludeClientIPFromCrumb: true
+        security:
+          apiToken:
+            creationOfLegacyTokenEnabled: false
+            tokenGenerationOnCreationEnabled: false
+            usageStatisticsEnabled: true
+      default-multibranch: | 
+        jobs:
+          - script: >
+              multibranchPipelineJob('nhlstats-default') {
+                  branchSources {
+                      github {
+                          id('nhlmbjob')
+                          repoOwner('nikizz-nr')
+                          repository('diploma')
+                          excludes('gh-pages')
+                          buildForkPRHead(false)
+                          buildForkPRMerge(false)
+                          buildOriginBranch(true)
+                          buildOriginBranchWithPR(true)
+                          buildOriginPRHead(false)
+                          buildOriginPRMerge(false)
+                          
+                      }
+                  }
+                  orphanedItemStrategy {
+                      discardOldItems {
+                          numToKeep(5)
+                      }
+                  }
+                  triggers {
+                      periodicFolderTrigger {
+                          interval('1h')
+                      }
+                  }
+              }
+      welcome-message: |
+        jenkins:
+          systemMessage: Welcome to devops diploma server!
+      tools: |
+        tool:
+          sonarRunnerInstallation:
+            installations:
+            - name: "sscanner"
+              properties:
+              - installSource:
+                  installers:
+                  - sonarRunnerInstaller:
+                      id: "4.7.0.2747"
+      creds: |
+        credentials:
+          system:
+            domainCredentials:
+            - credentials:
+              - usernamePassword:
+                  description: "access to smtp"
+                  id: "mail-relay-creds"
+                  password: ${jenkins-creds-mail-password}
+                  scope: GLOBAL
+                  username: ${jenkins-creds-mail-address}
+              - usernamePassword:
+                  description: "access to ecr"
+                  id: "ecr-creds"
+                  password: ${jenkins-creds-ecr-password}
+                  scope: GLOBAL
+                  username: ${jenkins-creds-ecr-login}
+              - string:
+                  description: "ecr url"
+                  id: "ecr-url"
+                  scope: GLOBAL
+                  secret: ${jenkins-creds-ecr-url}
+              - string:
+                  description: "ecr image name"
+                  id: "ecr-image"
+                  scope: GLOBAL
+                  secret: ${jenkins-creds-ecr-image}
+              - string:
+                  description: "database user"
+                  id: "db-user"
+                  scope: GLOBAL
+                  secret: ${jenkins-creds-db-user}
+              - string:
+                  description: "database password"
+                  id: "db-password"
+                  scope: GLOBAL
+                  secret: ${jenkins-creds-db-password}
+              - string:
+                  description: "database host"
+                  id: "db-host"
+                  scope: GLOBAL
+                  secret: ${jenkins-creds-db-host}
+              - string:
+                  description: "database name"
+                  id: "database"
+                  scope: GLOBAL
+                  secret: ${jenkins-creds-database}
+              - string:
+                  description: "devops mail address"
+                  id: "devops-mail"
+                  scope: GLOBAL
+                  secret: ${jenkins-creds-devops-mail}
+              - string:
+                  description: "sonarqube token"
+                  id: "sq"
+                  scope: GLOBAL
+                  secret: ${sq-creds-token}
+      unclassified: |
+        unclassified:
+          location:
+            adminAddress: "${jenkins-creds-mail-address}"
+            url: "http://${jenkins-creds-jenkins-url}:8081/"
+          gitHubConfiguration:
+            apiRateLimitChecker: ThrottleOnOver
+          sonarGlobalConfiguration:
+            buildWrapperEnabled: false
+            installations:
+            - credentialsId: "sq"
+              name: "sq-1"
+              serverUrl: "http://sonarqube-sonarqube.jenkins.svc.cluster.local:9000/"
+              triggers:
+                skipScmCause: false
+                skipUpstreamCause: false
+
+serviceAccount:
+  create: false
+  name: jenkins
+
+persistence:
+  enabled: true
+  size: 2Gi
+  storageClass: jenkins-sc
+

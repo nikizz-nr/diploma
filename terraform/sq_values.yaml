@@ -424,6 +424,7 @@ postgresql:
     enabled: true
     accessMode: ReadWriteOnce
     size: 1Gi
+    existingClaim: sonarqube-pvc
     #storageClass:
     storageClass: sonarqube-sc
   securityContext:

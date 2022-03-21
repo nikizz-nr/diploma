@@ -301,5 +301,6 @@ serviceAccount:
 persistence:
   enabled: true
   size: 2Gi
+  existingClaim: jenkins-pvc
   storageClass: jenkins-sc
 

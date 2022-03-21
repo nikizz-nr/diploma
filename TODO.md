@@ -5,7 +5,7 @@
 - [x] Dockerfile
 - [x] AWS compatible deployment
 - [x] IaC
-- [ ] CI/CD with Jenkins
-- [ ] CodeGate
-- [ ] Monitoring
-- [ ] Logs
+- [x] CI/CD with Jenkins
+- [x] SonarQube
+- [x] Monitoring
+- [x] Logs

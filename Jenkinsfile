@@ -3,6 +3,7 @@ pipeline {
     environment { 
         ECR_URL = credentials('ecr-url')
         ECR_IMAGE = credentials('ecr-image')
+        DEVOPS_MAIL = credentials('devops-mail')
     }
     stages {
         stage('Qualitygate') {
@@ -83,13 +84,6 @@ pipeline {
                             sh "helm -n production upgrade --install diploma diploma/nhlstats --set namespace=production --set image=${env.ECR_IMAGE} --set tag=${env.GIT_COMMIT} --set nodeport=32221"
                         }
                     }
-                }
-            }
-        }
-        stage('Print message') {
-            steps {
-                script {
-                    echo "Success build!"
                 }
             }
         }

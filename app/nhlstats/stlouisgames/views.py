@@ -3,6 +3,8 @@ from .models import Game
 from django.http import Http404
 from datetime import datetime
 from calendar import monthrange
+from django.conf import settings
+from socket import gethostname
 
 
 def index(request):
@@ -18,11 +20,19 @@ def index(request):
         Game.update_game_stats()
         return redirect('index')
     elif request.method == 'GET':
+        if settings.DEBUG:
+            try:
+                hostname = gethostname()
+            except:
+                hostname = 'localhost'
+        else:
+            hostname=""
         context = {
             'data': Game.get_data(),
             'top3': Game.get_best_toi_players(),
             'start_date': start_date,
-            'end_date': end_date
+            'end_date': end_date,
+            'hostname': hostname
         }
     else:
         raise Http404("Wrong method")

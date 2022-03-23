@@ -1,6 +1,5 @@
 # diploma
 ## Environment variables and config
-For composer-update use .env  
 For kubernetes (minikube) use .env.kuber  
 Example .env in env.example  
 
